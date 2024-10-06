@@ -76,10 +76,12 @@ const MainComponent: React.FC = () => {
               if (ttsResponse.ok) {
                 const audioData = await ttsResponse.blob();
                 const audioUrl = URL.createObjectURL(audioData);
-
+              
                 const audio = new Audio(audioUrl);
-                audio.play();
-
+                audio.play().catch((error) => {
+                  console.error('Error playing audio:', error);
+                });
+              
                 // Clean up the object URL after the audio is done playing
                 audio.onended = () => {
                   URL.revokeObjectURL(audioUrl);
