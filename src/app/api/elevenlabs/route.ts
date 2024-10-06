@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const requestBody: { text: string } = await request.json();
+    // Use a type assertion to ensure the result of request.json() is typed
+    const requestBody = await request.json() as { text: string };
     const { text } = requestBody;
     
     const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY!;
