@@ -1,31 +1,45 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome CSS
+import React, { useState } from "react";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
-const MessageInput: React.FC = () => {
-  const [message, setMessage] = useState('');
+interface MessageInputProps {
+  onSendMessage: (message: string, sender: "user" | "ai") => void;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
+const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
+  const [message, setMessage] = useState<string>("");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message.trim()) {
-      console.log('Message sent:', message);
-      setMessage(''); // Clear the input after sending the message
+      onSendMessage(message, "user");
+      setMessage("");
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  };
+
   return (
-    <div className="flex flex-col items-center mt-10 w-full">
-      <form onSubmit={handleSubmit} className="flex items-center w-full max-w-2xl p-2 border rounded-lg shadow-sm">
+    <div className="mt-10 flex w-full justify-start">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-[800px] items-center rounded-lg border p-2 shadow-sm"
+      >
         <input
           type="text"
-          className="flex-1 p-2 border-none rounded-l-lg focus:outline-none"
+          className="flex-1 rounded-l-lg border-none p-2 focus:outline-none"
           placeholder="Send a message"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleChange}
         />
-        <button type="submit" className="ml-2 p-2 bg-white text-black rounded-r-lg hover:bg-gray-200">
-          <i className="fas fa-paper-plane"></i>
+        <button
+          type="submit"
+          className="ml-2 rounded-r-lg bg-white p-2 text-black hover:bg-gray-200"
+        >
+          <PaperAirplaneIcon className="h-5 w-5 transform rotate-100 text-gray-500" />
         </button>
       </form>
     </div>
