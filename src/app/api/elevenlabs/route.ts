@@ -3,9 +3,11 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Explicitly type the destructured text
     const { text }: { text: string } = await request.json();
     
-    const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY as string;
+    // Use non-null assertion operator
+    const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY!;
     const voiceId = 'JBFqnCBsd6RMkjVDRZzb'; 
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
@@ -30,7 +32,8 @@ export async function POST(request: NextRequest) {
       return new NextResponse(`Error in ElevenLabs API call: ${errorText}`, { status: 500 });
     }
 
-    const audioData = await response.arrayBuffer() as ArrayBuffer;
+    // Remove unnecessary type assertion
+    const audioData = await response.arrayBuffer();
 
     return new NextResponse(audioData, {
       headers: {
