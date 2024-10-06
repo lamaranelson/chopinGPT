@@ -3,15 +3,16 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { text } = await request.json();
-    const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY;
+    const { text }: { text: string } = await request.json();
+    
+    const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY as string;
     const voiceId = 'JBFqnCBsd6RMkjVDRZzb'; 
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
       headers: {
         Accept: 'audio/mpeg',
-        'xi-api-key': elevenLabsApiKey!,
+        'xi-api-key': elevenLabsApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(`Error in ElevenLabs API call: ${errorText}`, { status: 500 });
     }
 
-    const audioData = await response.arrayBuffer();
+    const audioData = await response.arrayBuffer() as ArrayBuffer;
 
     return new NextResponse(audioData, {
       headers: {
