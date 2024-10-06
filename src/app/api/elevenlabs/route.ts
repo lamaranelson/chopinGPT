@@ -3,10 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    // Explicitly type the destructured text
-    const { text }: { text: string } = await request.json();
+    const requestBody: { text: string } = await request.json();
+    const { text } = requestBody;
     
-    // Use non-null assertion operator
     const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY!;
     const voiceId = 'JBFqnCBsd6RMkjVDRZzb'; 
 
@@ -32,7 +31,6 @@ export async function POST(request: NextRequest) {
       return new NextResponse(`Error in ElevenLabs API call: ${errorText}`, { status: 500 });
     }
 
-    // Remove unnecessary type assertion
     const audioData = await response.arrayBuffer();
 
     return new NextResponse(audioData, {
