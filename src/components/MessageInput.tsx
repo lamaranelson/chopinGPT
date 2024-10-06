@@ -1,47 +1,25 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 interface MessageInputProps {
-  onSendMessage: (message: string, sender: 'user' | 'ai') => void;
+  onSendMessage: (message: string, sender: "user" | "ai") => void;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<string>("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message.trim()) {
-      // Add user's message to the chat
-      onSendMessage(message, 'user');
-
-      // Send the message to the server
-      try {
-        const response = await fetch('/api/openai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Add AI's response to the chat
-          onSendMessage(data.message, 'ai');
-        } else {
-          console.error('Error from API:', data.error);
-          // Handle error (e.g., display a message)
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
-        // Handle error (e.g., display a message)
-      }
-
-      setMessage(''); // Clear the input
+      onSendMessage(message, "user");
+      setMessage("");
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
   };
 
   return (
@@ -55,13 +33,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
           className="flex-1 rounded-l-lg border-none p-2 focus:outline-none"
           placeholder="Send a message"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleChange}
         />
         <button
           type="submit"
           className="ml-2 rounded-r-lg bg-white p-2 text-black hover:bg-gray-200"
         >
-          <i className="fas fa-paper-plane"></i>
+          <PaperAirplaneIcon className="h-5 w-5 transform rotate-100 text-gray-500" />
         </button>
       </form>
     </div>

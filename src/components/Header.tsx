@@ -14,7 +14,7 @@ const Header: React.FC = () => {
         </div>
         </div>
       <div className="flex gap-2 items-center">
-        <a href="https://xy.ai" className="flex gap-2 items-center">
+        <a href="https://xy.ai" target="_blank" className="flex gap-2 items-center">
           <div className="px-1 w-7 h-7 text-sm font-medium text-center text-white bg-black rounded">
             XY
           </div>
