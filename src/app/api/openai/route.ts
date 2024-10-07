@@ -1,11 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { PrismaClient } from '@prisma/client'; // Import PrismaClient
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const prisma = new PrismaClient(); // Instantiate PrismaClient
 
 interface Message {
   sender: 'user' | 'ai';
@@ -18,22 +21,18 @@ interface RequestBody {
   model: string;
 }
 
-interface PromptResponse {
-  prompt: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const { messages, mode, model } = (await request.json()) as RequestBody;
 
-    const promptResponse = await fetch('/api/prompt', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    // Fetch the latest prompt directly from the database
+    const promptRecord = await prisma.prompt.findFirst({
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
-    const { prompt: fetchedPrompt } = (await promptResponse.json()) as PromptResponse;
+    const fetchedPrompt = promptRecord?.prompt || '';
 
     const modeTemperatures: Record<string, number> = {
       'Creative mode': 0.9,
