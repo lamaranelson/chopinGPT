@@ -54,17 +54,21 @@ const SystemPrompt: React.FC = () => {
     }
   };
 
-  const debounce = (func: Function, delay: number) => {
+  const debounce = <T extends (...args: unknown[]) => void>(func: T, delay: number) => {
     let timer: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (...args: Parameters<T>) => {
       clearTimeout(timer);
       timer = setTimeout(() => {
         func(...args);
       }, delay);
     };
   };
-
-  const debouncedSavePrompt = useCallback(debounce(savePrompt, 1000), [note]);
+  
+  const debouncedSavePrompt = useCallback(() => {
+    debounce(() => {
+      void savePrompt();
+    }, 1000)();
+  }, [note]);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNote(e.target.value);
