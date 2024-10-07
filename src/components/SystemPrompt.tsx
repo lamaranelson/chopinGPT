@@ -92,7 +92,7 @@ const SystemPrompt: React.FC = () => {
           onClick={restoreChopinsPrompt}
           className="rounded bg-teal-500 p-2 text-white"
         >
-          Restore Chopin's Prompt
+          Restore Chopin&apos;s Prompt
         </button>
       </div>
       <textarea
