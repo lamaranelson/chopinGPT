@@ -6,6 +6,7 @@ interface PromptResponse {
 
 const SystemPrompt: React.FC = () => {
   const [note, setNote] = useState<string>("");
+  const [confirmationMessage, setConfirmationMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchPrompt = async () => {
@@ -46,8 +47,10 @@ const SystemPrompt: React.FC = () => {
       }
 
       console.log("Prompt saved successfully");
+      setConfirmationMessage("Prompt saved successfully!"); // Set confirmation message
     } catch (error) {
       console.error("Error saving prompt:", error);
+      setConfirmationMessage("Error saving prompt."); // Set error message
     }
   };
 
@@ -67,6 +70,9 @@ const SystemPrompt: React.FC = () => {
       >
         Save Prompt
       </button>
+      {confirmationMessage && (
+        <div className="mt-2 text-green-500">{confirmationMessage}</div>
+      )}
     </div>
   );
 };
