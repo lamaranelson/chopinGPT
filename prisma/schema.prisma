@@ -18,7 +18,7 @@ model Post {
 
 model Prompt {
     id        Int      @id @default(autoincrement())
-    prompt    String
+    prompt    String @db.LongText
     createdAt DateTime @default(now())
     uniqueField String?
 }
