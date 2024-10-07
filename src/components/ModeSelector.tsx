@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ModeOption {
   title: string;
   description: string;
   icon?: string;
+}
+
+interface ModeSelectorProps {
+  selectedMode: string;
+  onModeSelect: (mode: string) => void;
 }
 
 const modeOptions: ModeOption[] = [
@@ -14,7 +19,7 @@ const modeOptions: ModeOption[] = [
   {
     title: "Balanced mode",
     description: '"Balance mode" generally refers to an AI chatbot or language model designed to strike a balance between providing helpful responses and maintaining appropriate boundaries with users.',
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/6cd0a346e11e78b0751c384b9b42a8035a8d90f10612299c570d26c91a86b54f?placeholderIfAbsent=true&apiKey=ca86d17a9e3445648b7b484e3e244d9a"
+    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/..."
   },
   {
     title: "Strict mode",
@@ -22,30 +27,23 @@ const modeOptions: ModeOption[] = [
   }
 ];
 
-const ModeSelector: React.FC = () => {
-  const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [markerPosition, setMarkerPosition] = useState<number | null>(null);
-
-  const handleModeSelect = (mode: string, index: number) => {
-    setSelectedMode(mode);
-    setMarkerPosition(index);
+const ModeSelector: React.FC<ModeSelectorProps> = ({ selectedMode, onModeSelect }) => {
+  const handleModeSelect = (mode: string) => {
+    onModeSelect(mode);
   };
 
   return (
-    <div className="flex flex-col mt-8 w-full">
+    <div className="flex flex-col w-full">
       <div className="flex flex-col w-full">
         <h2 className="text-2xl font-medium text-black">Mode</h2>
         {modeOptions.map((option, index) => (
           <div
             key={index}
-            className={`relative flex overflow-hidden flex-col justify-center px-4 py-3 mt-4 w-full rounded-lg border border-solid cursor-pointer ${
+            className={`relative flex overflow-hidden flex-col justify-center px-4 py-3 mt-3 w-full rounded-lg border border-solid cursor-pointer ${
               selectedMode === option.title ? 'border-blue-500' : 'border-gray-200'
             }`}
-            onClick={() => handleModeSelect(option.title, index)}
+            onClick={() => handleModeSelect(option.title)}
           >
-            {markerPosition === index && (
-              <div className="absolute top-0 left-0 w-full h-full border-2 border-blue-500 rounded-lg pointer-events-none" />
-            )}
             <div className="flex gap-3 items-start w-full">
               <div className="flex overflow-hidden flex-col justify-center p-1 w-6">
                 <div className={`flex shrink-0 rounded-full border border-dashed border-neutral-300 h-[17px] ${selectedMode === option.title ? 'bg-blue-500' : ''}`}>

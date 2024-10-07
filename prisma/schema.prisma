@@ -1,12 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "mysql"
     url      = env("DATABASE_URL")
 }
 
@@ -17,4 +14,11 @@ model Post {
     updatedAt DateTime @updatedAt
 
     @@index([name])
+}
+
+model Prompt {
+    id        Int      @id @default(autoincrement())
+    prompt    String @db.LongText
+    createdAt DateTime @default(now())
+    uniqueField String?
 }
