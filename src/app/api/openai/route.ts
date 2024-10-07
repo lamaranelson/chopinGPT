@@ -1,6 +1,5 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { system_prompt } from './prompts';
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
@@ -24,6 +23,15 @@ export async function POST(request: NextRequest) {
   try {
     const { messages, mode, model } = (await request.json()) as RequestBody;
 
+    const promptResponse = await fetch('/api/prompt', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const { prompt: fetchedPrompt } = await promptResponse.json();
+
     const modeTemperatures: Record<string, number> = {
       'Creative mode': 0.9,
       'Balanced mode': 0.6,
@@ -40,7 +48,7 @@ export async function POST(request: NextRequest) {
     const openaiMessages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content: system_prompt,
+        content: fetchedPrompt,
       },
       ...messages.map((msg): ChatCompletionMessageParam => ({
         role: msg.sender === 'ai' ? 'assistant' : 'user',
