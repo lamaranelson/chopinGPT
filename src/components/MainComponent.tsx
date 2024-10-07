@@ -29,6 +29,7 @@ const MainComponent: React.FC = () => {
     displayName: 'GPT 4 Turbo',
     apiName: 'gpt-4-turbo',
   });
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const handleSendMessage = async (newMessage: string, sender: 'user' | 'ai') => {
     const newMsg: Message = { sender, content: newMessage };
@@ -60,29 +61,38 @@ const MainComponent: React.FC = () => {
 
         if (isApiResponse(jsonResponse)) {
           const data = jsonResponse;
-
+    
           if (response.ok && data.message) {
             const aiMessage: Message = { sender: 'ai', content: data.message };
             setMessages((prevMessages) => [...prevMessages, aiMessage]);
-
+    
             try {
               const ttsResponse = await fetch('/api/elevenlabs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'audio/mpeg' },
                 body: JSON.stringify({ text: data.message }),
               });
-
+    
               if (ttsResponse.ok) {
                 const audioData = await ttsResponse.blob();
                 const audioUrl = URL.createObjectURL(audioData);
-              
+    
+                if (currentAudio) {
+                  currentAudio.pause();
+                  currentAudio.currentTime = 0;
+                  URL.revokeObjectURL(currentAudio.src);
+                }
+    
                 const audio = new Audio(audioUrl);
+                setCurrentAudio(audio);
+    
                 audio.play().catch((error) => {
                   console.error('Error playing audio:', error);
                 });
-              
+    
                 audio.onended = () => {
                   URL.revokeObjectURL(audioUrl);
+                  setCurrentAudio(null);
                 };
               } else {
                 console.error('Error fetching audio data for TTS');
