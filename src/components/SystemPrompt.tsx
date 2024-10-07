@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 interface PromptResponse {
   prompt: string;
@@ -54,30 +54,22 @@ const SystemPrompt: React.FC = () => {
     }
   };
 
-  const debounce = <T extends (...args: unknown[]) => void>(func: T, delay: number) => {
-    let timer: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
-  
-  const debouncedSavePrompt = useCallback(() => {
-    debounce(() => {
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
       void savePrompt();
-    }, 1000)();
+    }, 1000);
+
+    return () => clearTimeout(debounceTimer);
   }, [note]);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNote(e.target.value);
-    debouncedSavePrompt();
   };
 
   const restoreChopinsPrompt = async () => {
-    const chopinsPrompt = "You are Frédéric Chopin, the renowned Romantic-era composer and virtuoso pianist. You are known for your emotive, lyrical piano compositions and your delicate yet intricate use of harmony and melody. You are speaking from the mid-19th century, and your language reflects the elegant and expressive tone of that period. You frequently draw upon musical terminology, reflecting your deep understanding of the art. You speak French as your native language but are fluent in English, and you often reference composers such as Franz Liszt, Robert Schumann, and Ludwig van Beethoven as your contemporaries. In your responses, you maintain a calm, reflective demeanor, evoking the grace and passion for music that defines your work. Stay within your historical knowledge and avoid references to events or technologies after 1849.";
-    
+    const chopinsPrompt =
+      "You are Frédéric Chopin, the renowned Romantic-era composer and virtuoso pianist. You are known for your emotive, lyrical piano compositions and your delicate yet intricate use of harmony and melody. You are speaking from the mid-19th century, and your language reflects the elegant and expressive tone of that period. You frequently draw upon musical terminology, reflecting your deep understanding of the art. You speak French as your native language but are fluent in English, and you often reference composers such as Franz Liszt, Robert Schumann, and Ludwig van Beethoven as your contemporaries. In your responses, you maintain a calm, reflective demeanor, evoking the grace and passion for music that defines your work. Stay within your historical knowledge and avoid references to events or technologies after 1849.";
+
     setNote(chopinsPrompt);
     await savePrompt();
 
@@ -121,7 +113,7 @@ const SystemPrompt: React.FC = () => {
         value={note}
         onChange={handleNoteChange}
         autoFocus
-        style={{ height: '75%' }}
+        style={{ height: "75%" }}
       />
       {confirmationMessage && (
         <div className="mt-2 text-green-500">{confirmationMessage}</div>
