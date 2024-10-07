@@ -4,9 +4,9 @@ const Header: React.FC = () => {
   return (
     <header className="flex justify-between items-center px-6 py-4 w-full border-b border-gray-300 bg-white">
       <div className="flex gap-3 items-center">
-        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/9d4d3e157bc7040dbf44bce8c2e39e31732a24087b3fb47f43c681f73582797e?placeholderIfAbsent=true&apiKey=ca86d17a9e3445648b7b484e3e244d9a" className="object-contain w-10 rounded-lg" alt="Standard plan logo" />
+        <img loading="lazy" src="assets/Sidebar/chopin_headshot.png" className="object-contain w-10 rounded-lg" alt="Standard plan logo" />
         <div>
-          <div className="text-lg font-medium text-black">Chopin GPT</div>
+          <div className="text-lg font-medium text-black">ChopinGPT</div>
           <div className="flex gap-1 items-center mt-1 text-sm text-green-600">
             <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
             <div>Online</div>

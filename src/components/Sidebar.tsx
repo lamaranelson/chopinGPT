@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="flex flex-col w-3/12 h-screen max-md:ml-0 max-md:w-full">
-      <div className="flex flex-col justify-between px-10 py-6 w-full border-r border-gray-300 max-md:px-5">
+      <div className="flex flex-col justify-between h-full px-10 py-6 w-full border-r border-gray-300 max-md:px-5">
         <div className="flex flex-col w-full">
 
           <ModeSelector
@@ -151,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className={`flex items-center px-4 py-2 mr-2 ${
                 item.active
                   ? 'bg-black text-white'
-                  : 'bg-white text-gray-500 border border-gray-200'
+                  : 'bg-white text-gray-500 border border-gray-300'
               } rounded-lg cursor-pointer`}
             >
               <img

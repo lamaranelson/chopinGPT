@@ -105,7 +105,7 @@ const MainComponent: React.FC = () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-scroll">
         <Sidebar
           selectedMode={selectedMode}
           onModeSelect={setSelectedMode}
@@ -120,7 +120,7 @@ const MainComponent: React.FC = () => {
             <MessageInput onSendMessage={handleSendMessage} />
           </div>
         </div>
-        <div className="w-1/4 p-4 border-l border-gray-300 flex flex-col mt-20">
+        <div className="w-1/4 p-4 h-screen border-l border-gray-300 flex flex-col">
           <SystemPrompt />
         </div>
       </div>

@@ -33,13 +33,13 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({ selectedMode, onModeSelect 
   };
 
   return (
-    <div className="flex flex-col mt-8 w-full">
+    <div className="flex flex-col w-full">
       <div className="flex flex-col w-full">
         <h2 className="text-2xl font-medium text-black">Mode</h2>
         {modeOptions.map((option, index) => (
           <div
             key={index}
-            className={`relative flex overflow-hidden flex-col justify-center px-4 py-3 mt-4 w-full rounded-lg border border-solid cursor-pointer ${
+            className={`relative flex overflow-hidden flex-col justify-center px-4 py-3 mt-3 w-full rounded-lg border border-solid cursor-pointer ${
               selectedMode === option.title ? 'border-blue-500' : 'border-gray-200'
             }`}
             onClick={() => handleModeSelect(option.title)}

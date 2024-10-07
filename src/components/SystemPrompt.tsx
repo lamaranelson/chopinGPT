@@ -55,18 +55,19 @@ const SystemPrompt: React.FC = () => {
   };
 
   return (
-    <div className="mt-4 flex h-full flex-col">
-      <h2 className="mb-2 text-lg font-semibold">System Prompt</h2>
+    <div className="flex h-full flex-col">
+      <h2 className="text-2xl font-medium text-black">System Prompt</h2>
       <textarea
-        className="flex-1 resize-none rounded border border-gray-300 p-2 focus:outline-none focus:ring-0"
+        className="mt-3 rounded border border-gray-300 p-2 focus:outline-none focus:ring-0"
         placeholder="Write your system prompt here..."
         value={note}
         onChange={(e) => setNote(e.target.value)}
         autoFocus
+        style={{ height: '75%' }}
       />
       <button
         onClick={savePrompt}
-        className="mt-2 rounded bg-blue-500 p-2 text-white"
+        className="mt-3 rounded bg-blue-500 p-2 text-white"
       >
         Save Prompt
       </button>
