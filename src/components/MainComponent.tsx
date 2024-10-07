@@ -65,32 +65,31 @@ const MainComponent: React.FC = () => {
             const aiMessage: Message = { sender: 'ai', content: data.message };
             setMessages((prevMessages) => [...prevMessages, aiMessage]);
 
-            // Fetch audio and play
-            // try {
-            //   const ttsResponse = await fetch('/api/elevenlabs', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'audio/mpeg' },
-            //     body: JSON.stringify({ text: data.message }),
-            //   });
+            try {
+              const ttsResponse = await fetch('/api/elevenlabs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'audio/mpeg' },
+                body: JSON.stringify({ text: data.message }),
+              });
 
-            //   if (ttsResponse.ok) {
-            //     const audioData = await ttsResponse.blob();
-            //     const audioUrl = URL.createObjectURL(audioData);
+              if (ttsResponse.ok) {
+                const audioData = await ttsResponse.blob();
+                const audioUrl = URL.createObjectURL(audioData);
               
-            //     const audio = new Audio(audioUrl);
-            //     audio.play().catch((error) => {
-            //       console.error('Error playing audio:', error);
-            //     });
+                const audio = new Audio(audioUrl);
+                audio.play().catch((error) => {
+                  console.error('Error playing audio:', error);
+                });
               
-            //     audio.onended = () => {
-            //       URL.revokeObjectURL(audioUrl);
-            //     };
-            //   } else {
-            //     console.error('Error fetching audio data for TTS');
-            //   }
-            // } catch (error) {
-            //   console.error('Error in TTS:', error);
-            // }
+                audio.onended = () => {
+                  URL.revokeObjectURL(audioUrl);
+                };
+              } else {
+                console.error('Error fetching audio data for TTS');
+              }
+            } catch (error) {
+              console.error('Error in TTS:', error);
+            }
           } else {
             console.error('Error from API:', data.error);
           }
