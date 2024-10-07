@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Sidebar from 'src/components/Sidebar';
 import Header from 'src/components/Header';
 import ChatGPTContent from 'src/components/ChatGPTContent';
+import SystemPrompt from 'src/components/SystemPrompt';
 import MessageInput from 'src/components/MessageInput';
 
 interface Message {
@@ -28,6 +29,7 @@ const MainComponent: React.FC = () => {
     displayName: 'GPT 4 Turbo',
     apiName: 'gpt-4-turbo',
   });
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   const handleSendMessage = async (newMessage: string, sender: 'user' | 'ai') => {
     const newMsg: Message = { sender, content: newMessage };
@@ -41,7 +43,7 @@ const MainComponent: React.FC = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: updatedMessages, // Send the entire message history
+            messages: updatedMessages, 
             mode: selectedMode,
             model: selectedModel.apiName,
           }),
@@ -49,7 +51,6 @@ const MainComponent: React.FC = () => {
 
         const jsonResponse: unknown = await response.json();
 
-        // Type guard to check if jsonResponse is of type ApiResponse
         const isApiResponse = (data: unknown): data is ApiResponse => {
           return (
             typeof data === 'object' &&
@@ -60,31 +61,38 @@ const MainComponent: React.FC = () => {
 
         if (isApiResponse(jsonResponse)) {
           const data = jsonResponse;
-
+    
           if (response.ok && data.message) {
             const aiMessage: Message = { sender: 'ai', content: data.message };
             setMessages((prevMessages) => [...prevMessages, aiMessage]);
-
-            // Fetch audio data and play it
+    
             try {
               const ttsResponse = await fetch('/api/elevenlabs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'audio/mpeg' },
                 body: JSON.stringify({ text: data.message }),
               });
-
+    
               if (ttsResponse.ok) {
                 const audioData = await ttsResponse.blob();
                 const audioUrl = URL.createObjectURL(audioData);
-              
+    
+                if (currentAudio) {
+                  currentAudio.pause();
+                  currentAudio.currentTime = 0;
+                  URL.revokeObjectURL(currentAudio.src);
+                }
+    
                 const audio = new Audio(audioUrl);
+                setCurrentAudio(audio);
+    
                 audio.play().catch((error) => {
                   console.error('Error playing audio:', error);
                 });
-              
-                // Clean up the object URL after the audio is done playing
+    
                 audio.onended = () => {
                   URL.revokeObjectURL(audioUrl);
+                  setCurrentAudio(null);
                 };
               } else {
                 console.error('Error fetching audio data for TTS');
@@ -107,20 +115,23 @@ const MainComponent: React.FC = () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-scroll">
         <Sidebar
           selectedMode={selectedMode}
           onModeSelect={setSelectedMode}
           selectedModel={selectedModel}
           onModelSelect={setSelectedModel}
         />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-auto p-5">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto p-4">
             <ChatGPTContent messages={messages} />
           </div>
-          <div className="p-5 border-t border-gray-300">
+          <div className="p-4">
             <MessageInput onSendMessage={handleSendMessage} />
           </div>
+        </div>
+        <div className="w-1/4 p-4 h-screen border-l border-gray-300 flex flex-col">
+          <SystemPrompt />
         </div>
       </div>
     </div>

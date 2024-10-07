@@ -21,27 +21,12 @@ interface SidebarProps {
   onModelSelect: (model: Model) => void;
 }
 
-const initialNavItems: NavItem[] = [
-  {
-    text: 'History',
-    imgSrc:
-      'https://cdn.builder.io/api/v1/image/assets/TEMP/1d10da83f20e0fdab62122112c98374a4270123af1ae1259d754b2b89072e53a?placeholderIfAbsent=true&apiKey=YOUR_API_KEY',
-    active: false,
-  },
-  {
-    text: 'Main',
-    imgSrc:
-      'https://cdn.builder.io/api/v1/image/assets/TEMP/422d0b441f974cc8e0af18e7f5763a0e7ef6c6719b164abdc912815bb7fe24b9?placeholderIfAbsent=true&apiKey=YOUR_API_KEY',
-    active: true,
-  },
-];
+const initialNavItems: NavItem[] = [];
 
 const models: Model[] = [
   { displayName: 'GPT 4 Turbo', apiName: 'gpt-4-turbo' },
   { displayName: 'GPT 4', apiName: 'gpt-4' },
   { displayName: 'GPT 4o', apiName: 'gpt-4o' },
-  { displayName: 'o1-preview', apiName: 'o1-preview' },
-  { displayName: 'o1-mini', apiName: 'o1-mini' },
   { displayName: 'gpt-4o-mini', apiName: 'gpt-4o-mini' },
 ];
 
@@ -139,9 +124,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="flex flex-col w-3/12 h-screen max-md:ml-0 max-md:w-full">
-      <div className="flex flex-col justify-between px-10 py-6 w-full border-r border-gray-300 max-md:px-5">
+      <div className="flex flex-col justify-between h-full px-10 py-6 w-full border-r border-gray-300 max-md:px-5">
         <div className="flex flex-col w-full">
-          <h1 className="text-4xl font-medium text-black">Main</h1>
+
           <ModeSelector
             selectedMode={selectedMode}
             onModeSelect={onModeSelect}
@@ -164,7 +149,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className={`flex items-center px-4 py-2 mr-2 ${
                 item.active
                   ? 'bg-black text-white'
-                  : 'bg-white text-gray-500 border border-gray-200'
+                  : 'bg-white text-gray-500 border border-gray-300'
               } rounded-lg cursor-pointer`}
             >
               <img

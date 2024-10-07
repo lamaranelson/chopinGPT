@@ -1,13 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { system_prompt } from './prompts';
 import OpenAI from 'openai';
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-
+import { PrismaClient } from '@prisma/client'; // Import PrismaClient
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const prisma = new PrismaClient(); // Instantiate PrismaClient
 
 interface Message {
   sender: 'user' | 'ai';
@@ -24,6 +25,15 @@ export async function POST(request: NextRequest) {
   try {
     const { messages, mode, model } = (await request.json()) as RequestBody;
 
+    // Fetch the latest prompt directly from the database
+    const promptRecord = await prisma.prompt.findFirst({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const fetchedPrompt = promptRecord?.prompt ?? '';
+
     const modeTemperatures: Record<string, number> = {
       'Creative mode': 0.9,
       'Balanced mode': 0.6,
@@ -36,11 +46,10 @@ export async function POST(request: NextRequest) {
     console.log('Mode:', mode, 'Temperature:', temperature);
     console.log('Selected Model:', model);
 
-    // Map messages to OpenAI's expected format
     const openaiMessages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content: system_prompt,
+        content: fetchedPrompt,
       },
       ...messages.map((msg): ChatCompletionMessageParam => ({
         role: msg.sender === 'ai' ? 'assistant' : 'user',
@@ -70,7 +79,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: aiResponse });
   } catch (error: unknown) {
-    console.error('Error communicating with OpenAI:', error);
+    if (error instanceof Error) {
+      console.error('Error communicating with OpenAI:', error.message);
+    } else {
+      console.error('Error communicating with OpenAI:', error);
+    }
     return NextResponse.json(
       { error: 'Error communicating with OpenAI' },
       { status: 500 }

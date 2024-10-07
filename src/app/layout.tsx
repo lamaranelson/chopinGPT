@@ -4,7 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Chopin GPT",
+  title: "ChopinGPT",
   description: "A GPT Impersonation of Chopin",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
