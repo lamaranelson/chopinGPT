@@ -47,10 +47,12 @@ const SystemPrompt: React.FC = () => {
       }
 
       console.log("Prompt saved successfully");
-      setConfirmationMessage("Prompt saved successfully!"); // Set confirmation message
+      setConfirmationMessage("Prompt saved successfully!"); 
+      setTimeout(() => setConfirmationMessage(""), 3000); 
     } catch (error) {
       console.error("Error saving prompt:", error);
-      setConfirmationMessage("Error saving prompt."); // Set error message
+      setConfirmationMessage("Error saving prompt."); 
+      setTimeout(() => setConfirmationMessage(""), 3000);
     }
   };
 
