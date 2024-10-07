@@ -31,18 +31,18 @@ const ChatGPTContent: React.FC<ChatGPTContentProps> = ({ messages }) => {
       <div className="mt-5">
         {messages.map((message, index) => (
           <div
-            key={index}
-            className={`mb-2 rounded p-2 ${
-              message.sender === "user"
-                ? "bg-gray-100 text-left"
-                : "bg-blue-100 text-right"
-            } flex ${message.sender === "user" ? "justify-start" : "justify-end"}`}
-          >
-            <span className="font-semibold">
-              {message.sender === "user" ? "You: " : "ChopinGPT: "}
-            </span>
-            {message.content}
-          </div>
+          key={index}
+          className={`mb-2 rounded p-4 max-w-[90%] ${
+            message.sender === "user"
+              ? "bg-gray-100 text-left self-start"
+              : "bg-blue-100 text-left self-end"
+          }`}
+        >
+          <span className="font-semibold mr-1">
+            {message.sender === "user" ? "You: " : "ChopinGPT: "}&nbsp;
+          </span>
+          <span>{message.content}</span>
+        </div>
         ))}
         {/* Add a dummy div to act as the bottom anchor */}
         <div ref={messagesEndRef} />
