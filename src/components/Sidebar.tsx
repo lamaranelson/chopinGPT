@@ -27,8 +27,6 @@ const models: Model[] = [
   { displayName: 'GPT 4 Turbo', apiName: 'gpt-4-turbo' },
   { displayName: 'GPT 4', apiName: 'gpt-4' },
   { displayName: 'GPT 4o', apiName: 'gpt-4o' },
-  { displayName: 'o1-preview', apiName: 'o1-preview' },
-  { displayName: 'o1-mini', apiName: 'o1-mini' },
   { displayName: 'gpt-4o-mini', apiName: 'gpt-4o-mini' },
 ];
 
