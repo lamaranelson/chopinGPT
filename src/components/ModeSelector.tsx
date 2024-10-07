@@ -14,16 +14,16 @@ interface ModeSelectorProps {
 const modeOptions: ModeOption[] = [
   {
     title: "Creative mode",
-    description: '"Creative mode" could refer to a chatbot or AI language model designed to assist and inspire creativity. Such a chatbot or AI model might provide prompts, suggest ideas, or even generate content for creative projects.'
+    description: '"Creative mode" referS to the model being more flexible, creative, and random.'
   },
   {
     title: "Balanced mode",
-    description: '"Balance mode" generally refers to an AI chatbot or language model designed to strike a balance between providing helpful responses and maintaining appropriate boundaries with users.',
+    description: 'This mode refers to the model being more balanced and thus less random.',
     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/..."
   },
   {
     title: "Strict mode",
-    description: '"Strict mode" generally refers to an AI chatbot or language model that is designed to strictly adhere to a set of predefined rules or guidelines for responding to user queries.'
+    description: '"Strict mode" just means that the degree of randomness is minimized.'
   }
 ];
 

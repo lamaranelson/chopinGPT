@@ -1,14 +1,14 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { PrismaClient } from '@prisma/client'; // Import PrismaClient
+import { PrismaClient } from '@prisma/client'; 
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const prisma = new PrismaClient(); // Instantiate PrismaClient
+const prisma = new PrismaClient(); 
 
 interface Message {
   sender: 'user' | 'ai';
@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
   try {
     const { messages, mode, model } = (await request.json()) as RequestBody;
 
-    // Fetch the latest prompt directly from the database
     const promptRecord = await prisma.prompt.findFirst({
       orderBy: {
         createdAt: 'desc',
