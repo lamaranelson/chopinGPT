@@ -1,18 +1,22 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'; 
 
 const prisma = new PrismaClient();
 
+interface PromptRequest {
+  prompt: string;
+}
+
 export async function POST(request: Request) {
-  const { prompt } = await request.json();
-
-  if (!prompt) {
-    return new Response(JSON.stringify({ error: 'Prompt is required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
   try {
+    const { prompt }: PromptRequest = (await request.json()) as PromptRequest; 
+
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: 'Prompt is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const latestPrompt = await prisma.prompt.findFirst({
       orderBy: {
         createdAt: 'desc',
@@ -43,7 +47,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const promptRecord = await prisma.prompt.findFirst({
       orderBy: {
