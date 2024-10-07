@@ -1,8 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -19,6 +18,10 @@ interface RequestBody {
   model: string;
 }
 
+interface PromptResponse {
+  prompt: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { messages, mode, model } = (await request.json()) as RequestBody;
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const { prompt: fetchedPrompt } = await promptResponse.json();
+    const { prompt: fetchedPrompt } = (await promptResponse.json()) as PromptResponse;
 
     const modeTemperatures: Record<string, number> = {
       'Creative mode': 0.9,
@@ -44,7 +47,6 @@ export async function POST(request: NextRequest) {
     console.log('Mode:', mode, 'Temperature:', temperature);
     console.log('Selected Model:', model);
 
-    // Map messages to OpenAI's expected format
     const openaiMessages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
@@ -78,7 +80,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: aiResponse });
   } catch (error: unknown) {
-    console.error('Error communicating with OpenAI:', error);
+    if (error instanceof Error) {
+      console.error('Error communicating with OpenAI:', error.message);
+    } else {
+      console.error('Error communicating with OpenAI:', error);
+    }
     return NextResponse.json(
       { error: 'Error communicating with OpenAI' },
       { status: 500 }
