@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const fetchedPrompt = promptRecord?.prompt || '';
+    const fetchedPrompt = promptRecord?.prompt ?? '';
 
     const modeTemperatures: Record<string, number> = {
       'Creative mode': 0.9,
