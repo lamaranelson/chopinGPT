@@ -13,7 +13,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Find the most recent prompt
     const latestPrompt = await prisma.prompt.findFirst({
       orderBy: {
         createdAt: 'desc',
@@ -35,7 +34,7 @@ export async function POST(request: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error upserting prompt:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
@@ -63,7 +62,7 @@ export async function GET(request: Request) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching prompt:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
