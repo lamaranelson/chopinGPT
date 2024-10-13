@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { PaperAirplaneIcon, StopIcon } from "@heroicons/react/24/solid";
 
 interface MessageInputProps {
   onSendMessage: (message: string, sender: "user" | "ai") => void;
+  isPlaying: boolean;
+  stopAudio: () => void;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isPlaying, stopAudio }) => {
   const [message, setMessage] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,6 +22,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
+  };
+
+  const handleButtonClick = () => {
+    if (message.trim()) {
+      onSendMessage(message, "user");
+      setMessage("");
+    }
   };
 
   return (
@@ -36,10 +45,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
           onChange={handleChange}
         />
         <button
-          type="submit"
+          type="button"
           className="ml-2 rounded-r-lg bg-white p-2 text-black hover:bg-gray-200"
+          onClick={isPlaying ? stopAudio : handleButtonClick}
         >
-          <PaperAirplaneIcon className="h-5 w-5 transform rotate-100 text-gray-500" />
+          {isPlaying ? (
+            <StopIcon className="h-5 w-5 text-red-500" />
+          ) : (
+            <PaperAirplaneIcon className="h-5 w-5 transform rotate-100 text-gray-500" />
+          )}
         </button>
       </form>
     </div>

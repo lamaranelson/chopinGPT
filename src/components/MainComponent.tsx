@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Sidebar from 'src/components/Sidebar';
-import Header from 'src/components/Header';
-import ChatGPTContent from 'src/components/ChatGPTContent';
-import SystemPrompt from 'src/components/SystemPrompt';
-import MessageInput from 'src/components/MessageInput';
+import React, { useRef, useState } from "react";
+import Sidebar from "src/components/Sidebar";
+import Header from "src/components/Header";
+import ChatGPTContent from "src/components/ChatGPTContent";
+import SystemPrompt from "src/components/SystemPrompt";
+import MessageInput from "src/components/MessageInput";
 
 interface Message {
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   content: string;
 }
 
@@ -24,96 +24,165 @@ interface ApiResponse {
 
 const MainComponent: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedMode, setSelectedMode] = useState<string>('Balanced mode');
+  const [selectedMode, setSelectedMode] = useState<string>("Balanced mode");
   const [selectedModel, setSelectedModel] = useState<Model>({
-    displayName: 'GPT 4 Turbo',
-    apiName: 'gpt-4-turbo',
+    displayName: "GPT 4 Turbo",
+    apiName: "gpt-4-turbo",
   });
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const abortController = useRef<AbortController | null>(null);
 
-  const handleSendMessage = async (newMessage: string, sender: 'user' | 'ai') => {
-    const newMsg: Message = { sender, content: newMessage };
-    // Update the messages array
+  const initiateOpenAIStream = async (currentMessage: string) => {
+    // Abort any ongoing requests
+    abortController.current?.abort();
+    abortController.current = new AbortController();
+
+    const newMsg: Message = { sender: "user", content: currentMessage };
     const updatedMessages = [...messages, newMsg];
     setMessages(updatedMessages);
 
-    if (sender === 'user') {
-      try {
-        const response = await fetch('/api/openai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: updatedMessages, 
-            mode: selectedMode,
-            model: selectedModel.apiName,
-          }),
-        });
+    const url = new URL(window.location.origin + "/api/openai");
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: updatedMessages,
+        mode: selectedMode,
+        model: selectedModel.apiName,
+      }),
+      signal: abortController.current.signal,
+    });
 
-        const jsonResponse: unknown = await response.json();
+    console.log("Response from OpenAI stream:", response);
+    return response;
+  };
 
-        const isApiResponse = (data: unknown): data is ApiResponse => {
-          return (
-            typeof data === 'object' &&
-            data !== null &&
-            ('message' in data || 'error' in data)
-          );
-        };
+  const getGPTResponse = async (currentMessage: string) => {
+    const response = await initiateOpenAIStream(currentMessage);
+    if (!response.body) {
+      throw new Error("No response body");
+    }
+    const data = response.body;
 
-        if (isApiResponse(jsonResponse)) {
-          const data = jsonResponse;
-    
-          if (response.ok && data.message) {
-            const aiMessage: Message = { sender: 'ai', content: data.message };
-            setMessages((prevMessages) => [...prevMessages, aiMessage]);
-    
-            try {
-              const ttsResponse = await fetch('/api/elevenlabs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'audio/mpeg' },
-                body: JSON.stringify({ text: data.message }),
-              });
-    
-              if (ttsResponse.ok) {
-                const audioData = await ttsResponse.blob();
-                const audioUrl = URL.createObjectURL(audioData);
-    
-                if (currentAudio) {
-                  currentAudio.pause();
-                  currentAudio.currentTime = 0;
-                  URL.revokeObjectURL(currentAudio.src);
-                }
-    
-                const audio = new Audio(audioUrl);
-                setCurrentAudio(audio);
-    
-                audio.play().catch((error) => {
-                  console.error('Error playing audio:', error);
-                });
-    
-                audio.onended = () => {
-                  URL.revokeObjectURL(audioUrl);
-                  setCurrentAudio(null);
-                };
-              } else {
-                console.error('Error fetching audio data for TTS');
-              }
-            } catch (error) {
-              console.error('Error in TTS:', error);
-            }
+    if (!data) {
+      throw new Error("No data");
+    }
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    const accumulatedChunks: string[] = [];
+
+    while (true) {
+      const { value, done: doneReading } = await reader.read();
+      if (doneReading) {
+        const fullText = accumulatedChunks.join("");
+        await convertTextToSpeech(fullText);
+        break;
+      }
+      const chunkValue = decoder.decode(value);
+
+      // Handle potential multiple chunks separated by newlines
+      const chunks = chunkValue.includes("\n\n")
+        ? chunkValue.split("\n\n").flatMap((chunk) => chunk.split("\n"))
+        : chunkValue.split("\n");
+
+      for (const chunk of chunks) {
+        let processedChunk = chunk.replaceAll("0:", ""); // Remove "0:" from the string
+
+        processedChunk = processedChunk
+          .replace(/^"/, "") // Remove the double quote at the start
+          .replace(/(?<!\\)"$/, ""); // Remove the double quote at the end only if not preceded by a backslash
+
+        // Unescape any escaped characters in the chunk
+        processedChunk = processedChunk
+          .replace(/\\n/g, "\n")
+          .replace(/\\t/g, "\t")
+          .replace(/\\r/g, "\r")
+          .replace(/\\\\"/g, '"');
+
+        accumulatedChunks.push(processedChunk);
+
+        setMessages((prevMessages) => {
+          const lastMessage = prevMessages[prevMessages.length - 1];
+          if (lastMessage && lastMessage.sender === "ai") {
+            // Append to the last AI message
+            const updatedLastMessage = {
+              ...lastMessage,
+              content: lastMessage.content + processedChunk,
+            };
+            return [...prevMessages.slice(0, -1), updatedLastMessage];
           } else {
-            console.error('Error from API:', data.error);
+            // Add a new AI message
+            const newMessage: Message = {
+              sender: "ai",
+              content: processedChunk,
+            };
+            return [...prevMessages, newMessage];
           }
-        } else {
-          console.error('Invalid response format');
-        }
+        });
+      }
+    }
+  };
+
+  const convertTextToSpeech = async (text: string) => {
+    const response = await fetch("/api/elevenlabs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+      signal: abortController.current?.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to convert text to speech");
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const newAudio = new Audio(audioUrl);
+
+    const playPromise = newAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+
+    setAudio(newAudio);
+    setIsPlaying(true);
+
+    newAudio.onended = () => {
+      setIsPlaying(false);
+    };
+  };
+
+  const stopAudio = () => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
+  const handleSendMessage = async (
+    newMessage: string,
+    sender: "user" | "ai",
+  ) => {
+    if (sender === "user") {
+      stopAudio(); // Stop any playing audio
+      try {
+        await getGPTResponse(newMessage);
       } catch (error) {
-        console.error('Error sending message:', error);
+        console.error("Error sending message:", error);
       }
     }
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white">
+    <div className="flex h-screen flex-col overflow-hidden bg-white">
       <Header />
       <div className="flex flex-1 overflow-scroll">
         <Sidebar
@@ -127,10 +196,14 @@ const MainComponent: React.FC = () => {
             <ChatGPTContent messages={messages} />
           </div>
           <div className="p-4">
-            <MessageInput onSendMessage={handleSendMessage} />
+            <MessageInput
+              onSendMessage={handleSendMessage}
+              isPlaying={isPlaying}
+              stopAudio={stopAudio}
+            />
           </div>
         </div>
-        <div className="w-1/4 p-4 h-screen border-l border-gray-300 flex flex-col">
+        <div className="flex h-screen w-1/4 flex-col border-l border-gray-300 p-4">
           <SystemPrompt />
         </div>
       </div>

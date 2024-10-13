@@ -1,14 +1,19 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { PrismaClient } from '@prisma/client'; 
+import { PrismaClient } from '@prisma/client';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
+import { OpenAIStream, StreamingTextResponse } from 'ai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const prisma = new PrismaClient(); 
+export const config = {
+  runtime: "edge",
+};
+
+const prisma = new PrismaClient();
 
 interface Message {
   sender: 'user' | 'ai';
@@ -56,7 +61,6 @@ export async function POST(request: NextRequest) {
       })),
     ];
 
-    // Call the OpenAI API with correctly typed messages
     const response = await openai.chat.completions.create({
       model: model,
       messages: openaiMessages,
@@ -65,18 +69,16 @@ export async function POST(request: NextRequest) {
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
+      stream: true
     });
 
-    const aiResponse = response.choices[0]?.message?.content;
+    console.log("OpenAI response received");
 
-    if (!aiResponse) {
-      return NextResponse.json(
-        { error: 'No response from OpenAI' },
-        { status: 500 }
-      );
-    }
+    // Convert the response into a friendly text-stream
+    const stream = OpenAIStream(response);
 
-    return NextResponse.json({ message: aiResponse });
+    // Respond with the stream
+    return new StreamingTextResponse(stream);
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error('Error communicating with OpenAI:', error.message);
