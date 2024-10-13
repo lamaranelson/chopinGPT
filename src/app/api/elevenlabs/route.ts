@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const { text } = requestBody;
     
     const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY!;
-    const voiceId = 'JBFqnCBsd6RMkjVDRZzb'; 
+    const voiceId = 'NyxenPOqNyllHIzSoPbJ'; 
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
