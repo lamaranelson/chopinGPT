@@ -43,6 +43,8 @@ const SystemPrompt: React.FC = () => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed to save prompt:", response.status, errorText);
         throw new Error("Failed to save prompt");
       }
 
