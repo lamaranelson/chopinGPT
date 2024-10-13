@@ -36,7 +36,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts"
-, "src/components/MainComponent_backuptxt"  ],
+    ".next/types/**/*.ts",
+  ],
+  
   "exclude": ["node_modules"]
 }
