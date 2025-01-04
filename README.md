@@ -1,29 +1,58 @@
-# Create T3 App
+# ChopinGPT
+
+## T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## What's next? How do I make an app with this?
+ChopinGPT is a ready to deploy web application that brings the legendary composer Fryderyk Franciszek Chopin back to life using the power of OpenAI's GPT-4 model and ElevenLabs' text-to-speech technology. Engage in conversations with "Chopin" and experience his insights as if he were here today.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Tech Stack
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+* Next.js 15 
+* TypeScript
+* Tailwind CSS for styling
+* Prisma as ORM with a MySQL db
+* OpenAI API for the LLM
+* ElevenLabs API for text-to-speech
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Installation
 
-## Learn More
+### Clone the Repository
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+```bash
+git clone https://github.com/your_username/chopingpt.git
+cd chopingpt
+```
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Install Dependencies
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+```bash
+yarn install
+```
 
-## How do I deploy this?
+### Set Up Environment Variables
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Create a `.env` file in the root directory and add the following:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+ELEVEN_LABS_API_KEY=your_elevenlabs_api_key
+DATABASE_URL=mysql://user:password@localhost:3306/chopingpt
+```
+
+### Set Up the Database
+
+1. Ensure your MySQL server is running
+2. Run Prisma migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### Run the Development Server
+
+```bash
+yarn dev
+```
+
+The application should now be running at http://localhost:3000.
