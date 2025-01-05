@@ -8,12 +8,12 @@ ChopinGPT is a ready to deploy web application that brings the legendary compose
 
 ## Tech Stack
 
-* Next.js 15 
-* TypeScript
-* Tailwind CSS for styling
-* Prisma as ORM with a MySQL db
-* OpenAI API for the LLM
-* ElevenLabs API for text-to-speech
+- Next.js 15
+- TypeScript
+- Tailwind CSS for styling
+- Prisma as ORM with a MySQL db to store changes in the system prompt. (If you are not deploying the app you can also use SQLite with Prisma)
+- OpenAI API for the LLM
+- ElevenLabs API for text-to-speech
 
 ## Installation
 
@@ -49,6 +49,12 @@ DATABASE_URL=mysql://user:password@localhost:3306/chopingpt
 npx prisma migrate dev --name init
 ```
 
+3. Generate the Prisma Client:
+
+```bash
+npx prisma generate
+```
+
 ### Run the Development Server
 
 ```bash
@@ -57,6 +63,4 @@ yarn dev
 
 The application should now be running at http://localhost:3000.
 
-
 <img width="1488" alt="Screenshot 2025-01-05 at 2 33 55 PM" src="https://github.com/user-attachments/assets/9f4c9b5d-af11-401b-83cc-5523c1736cac" />
-
