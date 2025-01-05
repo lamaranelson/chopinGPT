@@ -12,7 +12,7 @@ ChopinGPT is a ready to deploy web application that brings the legendary compose
 - TypeScript
 - Tailwind CSS for styling
 - Prisma as ORM with a MySQL db to store changes in the system prompt. (If you are not deploying the app you can also use SQLite with Prisma)
-- OpenAI API for the LLM
+- OpenAI API for the LLM (with response streaming)
 - ElevenLabs API for text-to-speech
 
 ## Installation
