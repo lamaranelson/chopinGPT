@@ -56,3 +56,6 @@ yarn dev
 ```
 
 The application should now be running at http://localhost:3000.
+
+
+<img width="1489" alt="Screenshot 2025-01-05 at 2 30 28 PM" src="https://github.com/user-attachments/assets/8e8668b9-5d58-43e9-a238-8eb17a2637f1" />
